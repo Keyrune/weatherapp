@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'config.dart';
 
 void main() => runApp(MaterialApp(title: "Wheather App", home: Home()));
 
@@ -13,6 +14,26 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  var temp;
+  var currently;
+  var humidity;
+  var windSpeed;
+
+  Future getWeather() async {
+    http.Response response = await http.get(Uri.https(
+        'http://api.openweathermap.org/',
+        'data/2.5/weather?q=Moscow&appid=$apiKey'));
+    var results = jsonDecode(response.body);
+    setState(() {
+      this.temp = results['main']['temp'];
+    });
+  }
+
+  void initState() {
+    super.initState();
+    this.getWeather();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,7 +55,7 @@ class _HomeState extends State<Home> {
                         color: Colors.white,
                         fontWeight: FontWeight.w600)),
               ),
-              Text('13\u00b0',
+              Text(temp != null ? '$temp\u00b0' : 'Loading...',
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 40.0,
